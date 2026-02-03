@@ -1,5 +1,5 @@
 
-import { TaskStatus, TaskPriority, TaskType, UserRole, GroupPermissions, TaskVisibility, StepStatus } from './types';
+import { TaskStatus, TaskPriority, TaskType, UserRole, GroupPermissions, TaskVisibility, StepStatus, User, Task } from './types';
 
 export const DEFAULT_GROUPS: GroupPermissions[] = [
   {
@@ -63,14 +63,55 @@ export const PRIORITY_COLORS: Record<TaskPriority, string> = {
   [TaskPriority.CRITICAL]: 'bg-red-600 text-white',
 };
 
-export const MOCK_USERS = [
-  { id: 'u-1', name: 'Carlos Silva', sector: UserRole.ADMIN, email: 'carlos@tecnoperfil.com.br', groupIds: ['g-admin'], active: true, avatar: 'https://i.pravatar.cc/150?u=u1' },
-  { id: 'u-2', name: 'Ana Oliveira', sector: UserRole.PCP, email: 'ana.pcp@tecnoperfil.com.br', groupIds: ['g-pcp'], active: true, avatar: 'https://i.pravatar.cc/150?u=u2' },
-  { id: 'u-3', name: 'João Santos', sector: UserRole.PRODUCTION, email: 'joao.prod@tecnoperfil.com.br', groupIds: ['g-prod'], active: true, avatar: 'https://i.pravatar.cc/150?u=u3' },
-  { id: 'u-4', name: 'Beatriz Costa', sector: UserRole.QUALITY, email: 'beatriz.qual@tecnoperfil.com.br', groupIds: ['g-qual'], active: true, avatar: 'https://i.pravatar.cc/150?u=u4' },
+export const MOCK_USERS: User[] = [
+  { 
+    id: 'u-1', 
+    name: 'Carlos Silva', 
+    email: 'carlos@tecnoperfil.com.br', 
+    sectorId: 's-1', 
+    groupIds: ['g-admin'], 
+    active: true, 
+    avatar: 'https://i.pravatar.cc/150?u=u1',
+    isOnline: true,
+    lastAccess: new Date().toISOString()
+  },
+  { 
+    id: 'u-2', 
+    name: 'Ana Oliveira', 
+    email: 'ana.pcp@tecnoperfil.com.br', 
+    sectorId: 's-2', 
+    groupIds: ['g-pcp'], 
+    active: true, 
+    avatar: 'https://i.pravatar.cc/150?u=u2',
+    isOnline: true,
+    lastAccess: new Date().toISOString()
+  },
+  { 
+    id: 'u-3', 
+    name: 'João Santos', 
+    email: 'joao.prod@tecnoperfil.com.br', 
+    sectorId: 's-3', 
+    groupIds: ['g-prod'], 
+    active: true, 
+    avatar: 'https://i.pravatar.cc/150?u=u3',
+    isOnline: false,
+    lastAccess: new Date(Date.now() - 3600000 * 2).toISOString() // 2 hours ago
+  },
+  { 
+    id: 'u-4', 
+    name: 'Beatriz Costa', 
+    email: 'beatriz.qual@tecnoperfil.com.br', 
+    sectorId: 's-4', 
+    groupIds: ['g-qual'], 
+    active: true, 
+    avatar: 'https://i.pravatar.cc/150?u=u4',
+    isOnline: false,
+    lastAccess: new Date(Date.now() - 86400000).toISOString() // Yesterday
+  },
 ];
 
-export const MOCK_TASKS = [
+// Added missing attachments field and explicit Task[] type to MOCK_TASKS
+export const MOCK_TASKS: Task[] = [
   {
     id: 'T-1001',
     type: TaskType.PRODUCTION_PRIORITY,
@@ -82,6 +123,9 @@ export const MOCK_TASKS = [
     opNumber: 'OP-5582',
     quantity: 500,
     openDate: '2023-10-25T10:00:00Z',
+    // Added missing createdAt and createdBy properties to satisfy Task interface
+    createdAt: '2023-10-25T09:45:00Z',
+    createdBy: 'Ana Oliveira',
     deadline: '2023-10-27',
     status: TaskStatus.IN_PROGRESS,
     visibility: TaskVisibility.GLOBAL,
@@ -89,6 +133,7 @@ export const MOCK_TASKS = [
     executorGroupId: 'g-prod',
     followerIds: ['u-4'],
     history: [],
+    attachments: [],
     steps: [
       { id: 's1', title: 'Verificar disponibilidade de matéria-prima', status: StepStatus.COMPLETED, order: 1, responsibleGroupId: 'g-pcp' },
       { id: 's2', title: 'Configurar matriz na extrusora 04', status: StepStatus.IN_PROGRESS, order: 2, responsibleGroupId: 'g-prod' },
@@ -106,6 +151,9 @@ export const MOCK_TASKS = [
     opNumber: 'OP-5590',
     quantity: 12,
     openDate: '2023-10-25T11:30:00Z',
+    // Added missing createdAt and createdBy properties to satisfy Task interface
+    createdAt: '2023-10-25T11:15:00Z',
+    createdBy: 'João Santos',
     deadline: '2023-10-26',
     status: TaskStatus.OPEN,
     visibility: TaskVisibility.GROUP,
@@ -114,6 +162,7 @@ export const MOCK_TASKS = [
     executorGroupId: 'g-qual',
     followerIds: [],
     history: [],
+    attachments: [],
     steps: [
       { id: 's4', title: 'Coletar amostras na linha', status: StepStatus.PENDING, order: 1, responsibleGroupId: 'g-prod' },
       { id: 's5', title: 'Realizar teste de tração', status: StepStatus.PENDING, order: 2, responsibleGroupId: 'g-qual' }

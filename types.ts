@@ -2,7 +2,15 @@
 export enum TaskVisibility {
   GLOBAL = 'Global',
   GROUP = 'Grupo',
+  SECTOR = 'Setor',
   PRIVATE = 'Privado'
+}
+
+export enum NotificationTarget {
+  NONE = 'Nenhuma',
+  INDIVIDUAL = 'Individual',
+  GROUP = 'Grupo',
+  GLOBAL = 'Global'
 }
 
 export interface Sector {
@@ -13,7 +21,6 @@ export interface Sector {
   color?: string;
 }
 
-// Added missing UserRole enum to fix import errors in constants.tsx and TaskModal.tsx
 export enum UserRole {
   ADMIN = 'Administrador',
   PCP = 'PCP',
@@ -87,6 +94,8 @@ export interface User {
   groupIds: string[];
   active: boolean;
   avatar?: string;
+  isOnline: boolean;
+  lastAccess: string;
 }
 
 export interface TaskHistory {
@@ -109,10 +118,16 @@ export interface Attachment {
   date: string;
 }
 
+export interface QualityMetrics {
+  hardnessWebster?: number;
+  layerThickness?: number;
+  lengthTolerance?: boolean;
+  visualInspection?: 'Aprovado' | 'Reprovado';
+}
+
 export interface Task {
   id: string;
   type: TaskType;
-  // Updated property names from Id suffix to match actual usage in components and mock data
   requestingSector: string;
   responsibleSector: string;
   priority: TaskPriority;
@@ -120,7 +135,11 @@ export interface Task {
   productProfile: string;
   opNumber?: string;
   quantity?: number;
-  openDate: string;
+  openDate: string; // Data de abertura no sistema
+  createdAt: string; // Data real de criação (ISO)
+  createdBy: string; // Nome do criador
+  startedAt?: string; // Início da execução
+  completedAt?: string; // Fim da execução
   deadline: string;
   responsibleId?: string;
   executorGroupId: string;
@@ -130,9 +149,12 @@ export interface Task {
   visibility: TaskVisibility;
   visibleGroupIds?: string[];
   visibleUserIds?: string[];
+  visibleSectorIds?: string[];
   history: TaskHistory[];
   attachments: Attachment[];
   steps: TaskStep[];
+  notificationTarget?: NotificationTarget;
+  qualityMetrics?: QualityMetrics;
 }
 
 export interface AppNotification {
@@ -143,4 +165,21 @@ export interface AppNotification {
   date: string;
   read: boolean;
   taskId?: string;
+}
+
+export interface Machine {
+  id: string;
+  name: string;
+  status: 'running' | 'idle' | 'down' | 'maintenance';
+  lastOEE: number;
+  currentOP?: string;
+}
+
+export interface InventoryItem {
+  id: string;
+  name: string;
+  unit: string;
+  currentStock: number;
+  minStock: number;
+  maxStock?: number;
 }
