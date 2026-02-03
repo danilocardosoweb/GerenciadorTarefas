@@ -1,13 +1,11 @@
-
 # 🏭 Guia de Configuração - Banco de Dados TecnoPerfil
 
-Para colocar o sistema em produção, siga exatamente os passos abaixo no seu painel do **Supabase**.
+Siga estas instruções no **SQL Editor** do Supabase para configurar o ambiente.
 
-## 1. Criação das Tabelas
-Vá em **SQL Editor** > **New Query** e cole o script abaixo. Este script cria toda a estrutura industrial necessária.
+## 1. Estrutura de Tabelas (Esquema Industrial)
 
 ```sql
--- 1. SETORES
+-- TABELA: SETORES
 CREATE TABLE sectors (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
@@ -16,7 +14,7 @@ CREATE TABLE sectors (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
--- 2. USUÁRIOS
+-- TABELA: USUÁRIOS
 CREATE TABLE users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
@@ -30,9 +28,9 @@ CREATE TABLE users (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
--- 3. TAREFAS / OPs
+-- TABELA: TAREFAS / OPs
 CREATE TABLE tasks (
-  id TEXT PRIMARY KEY, -- Ex: T-1001
+  id TEXT PRIMARY KEY,
   type TEXT NOT NULL,
   requesting_sector TEXT NOT NULL,
   responsible_sector TEXT NOT NULL,
@@ -48,24 +46,28 @@ CREATE TABLE tasks (
   requestor_id UUID REFERENCES users(id),
   status TEXT DEFAULT 'Aberto',
   visibility TEXT DEFAULT 'Global',
-  created_at TIMESTAMPTZ DEFAULT now()
+  created_at TIMESTAMPTZ DEFAULT now(),
+  started_at TIMESTAMPTZ,
+  completed_at TIMESTAMPTZ,
+  created_by TEXT
 );
 
--- 4. WORKFLOW (ETAPAS)
+-- TABELA: WORKFLOW (ETAPAS PLANEJADAS)
 CREATE TABLE task_steps (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   task_id TEXT REFERENCES tasks(id) ON DELETE CASCADE,
-  title TEXT NOT NULL,
-  description TEXT,
-  responsible_group_id TEXT,
+  title TEXT NOT NULL,           -- Nome da Etapa
+  description TEXT,              -- Instruções Técnicas
+  responsible_group_id TEXT,     -- Grupo Responsável (PCP, Produção, etc)
   responsible_user_id UUID REFERENCES users(id),
   status TEXT DEFAULT 'Pendente',
-  order_index INTEGER NOT NULL,
+  order_index INTEGER NOT NULL,  -- Sequência da Linha de Produção
+  deadline DATE,                 -- Prazo específico da etapa
   completed_at TIMESTAMPTZ,
-  completed_by TEXT
+  completed_by TEXT              -- Nome do operador que concluiu
 );
 
--- 5. ANEXOS
+-- TABELA: ANEXOS
 CREATE TABLE task_attachments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   task_id TEXT REFERENCES tasks(id) ON DELETE CASCADE,
@@ -76,7 +78,7 @@ CREATE TABLE task_attachments (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
--- 6. HISTÓRICO / AUDITORIA
+-- TABELA: HISTÓRICO DE AUDITORIA
 CREATE TABLE task_history (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   task_id TEXT REFERENCES tasks(id) ON DELETE CASCADE,
@@ -84,20 +86,20 @@ CREATE TABLE task_history (
   user_name TEXT,
   action TEXT NOT NULL,
   details TEXT,
+  type TEXT DEFAULT 'manual',
   timestamp TIMESTAMPTZ DEFAULT now()
 );
 ```
 
-## 2. Inserção do Usuário Mestre (Admin)
-Após criar as tabelas, execute este comando para conseguir logar pela primeira vez:
+## 2. Configuração Inicial (Primeiro Acesso)
 
 ```sql
--- Primeiro, criamos o setor PCP
+-- 1. Criar o setor mestre
 INSERT INTO sectors (name, initials) VALUES ('PCP - Planejamento', 'PCP');
 
--- Agora criamos o usuário admin (Substitua a senha se desejar)
--- O email deve ser exatamente: admin@tecnoperfil.com.br
--- A senha inicial será: tecnoperfil2025
+-- 2. Criar o usuário administrador padrão
+-- Email: admin@tecnoperfil.com.br
+-- Senha: tecnoperfil2025
 INSERT INTO users (name, email, password, sector_id, active)
 SELECT 
   'Administrador TecnoPerfil', 
@@ -108,13 +110,6 @@ SELECT
 FROM sectors WHERE initials = 'PCP' LIMIT 1;
 ```
 
-## 3. Configuração de CORS (Essencial para Produção)
-Para evitar o erro de login que você teve anteriormente:
-1. Vá em **Settings** > **API**.
-2. Procure por **CORS Config**.
-3. Em **Allowed Origins**, adicione o domínio da sua Vercel (ex: `tecnoperfil-app.vercel.app`) ou coloque `*` para testes (não recomendado para produção definitiva).
-
-## 4. Variáveis de Ambiente
-Na Vercel, configure:
-- `process.env.API_KEY`: Sua chave do Gemini.
-- As chaves do Supabase já estão embutidas no `supabaseClient.ts` com o token fornecido.
+## 3. Notas de Segurança
+- Certifique-se de habilitar **CORS** no painel do Supabase para o domínio da sua aplicação.
+- As tabelas possuem `ON DELETE CASCADE` para garantir que ao excluir uma OP, todos os seus registros de histórico e anexos sejam removidos automaticamente.

@@ -1,20 +1,29 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# 🏭 TecnoPerfil - Gestão Industrial 4.0
 
-# Run and deploy your AI Studio app
+Sistema avançado para gerenciamento de extrusão de alumínio, integrando PCP, Produção, Qualidade e Logística em uma plataforma unificada.
 
-This contains everything you need to run your app locally.
+## 🚀 Tecnologias
+- **Frontend:** React 19 + Tailwind CSS (Mobile First).
+- **IA Generativa:** Google Gemini (Análise de gargalos e automação de e-mails).
+- **Backend/DB:** Supabase (Sincronização em tempo real).
+- **Ícones:** Lucide React.
+- **Gráficos:** Recharts.
 
-View your app in AI Studio: https://ai.studio/apps/drive/1yEMbXcoIlAJCMOFcykmKitedkL1jvTOd
+## 🛠 Funcionalidades Principais
+1. **Dashboard OEE:** Monitoramento em tempo real da eficiência das extrusoras.
+2. **Gestão de Workflow:** Criação de fases industriais detalhadas com atribuição de responsável, prazo e instruções técnicas.
+3. **Análise Preditiva:** O botão de IA analisa a carga de trabalho e prevê atrasos baseando-se nas OPs em aberto.
+4. **Controle de Insumos:** Gerenciamento de estoque de tarugos e embalagens com alertas visuais de nível crítico.
+5. **Auditoria Total:** Histórico imutável de quem abriu, moveu ou finalizou cada etapa do processo.
 
-## Run Locally
+## 📐 Arquitetura de Workflow
+O sistema utiliza um padrão de "Fases Planejadas":
+- **Título:** Ação industrial clara.
+- **Responsável:** Grupo de permissão (ex: Qualidade).
+- **Deadline:** Data limite para cumprimento do SLA.
+- **Instruções:** Detalhes técnicos sobre a operação (ex: parâmetros da prensa).
 
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## 🔒 Segurança
+- Autenticação por e-mail corporativo.
+- Matriz de permissões configurável por setor.
+- Visibilidade de tarefas controlada (Global, Setor, Grupo ou Privado).
